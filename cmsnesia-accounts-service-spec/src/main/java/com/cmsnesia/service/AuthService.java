@@ -1,6 +1,7 @@
 package com.cmsnesia.service;
 
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.api.Result;
 import reactor.core.publisher.Mono;
 
@@ -8,5 +9,5 @@ public interface AuthService extends BaseService<AuthDto> {
 
   Mono<Result<AuthDto>> findByUsername(String username);
 
-  Mono<Result<AuthDto>> changePassword(AuthDto session, String newPassword);
+  Mono<Result<AuthDto>> changePassword(Session session, String newPassword);
 }

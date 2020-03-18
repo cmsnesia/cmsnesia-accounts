@@ -1,6 +1,7 @@
 package com.cmsnesia.service;
 
 import com.cmsnesia.assembler.AuthAssembler;
+import com.cmsnesia.assembler.SessionAssembler;
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
 import com.cmsnesia.model.EmailDto;
@@ -28,6 +29,8 @@ public class AuthServiceTest {
   @Autowired private AuthService authService;
 
   @Autowired private AuthAssembler authAssembler;
+
+  @Autowired private SessionAssembler sessionAssembler;
 
   @MockBean private AuthRepo authRepo;
 
@@ -65,7 +68,7 @@ public class AuthServiceTest {
   public void addTest() {
     Auth entity = authAssembler.fromDto(dto);
     Mockito.when(authRepo.save(Mockito.any())).thenReturn(Mono.just(entity));
-    authService.add(dto, dto);
+    authService.add(sessionAssembler.fromEntity(dto), dto);
   }
 
   @Test
@@ -73,7 +76,7 @@ public class AuthServiceTest {
     Auth entity = authAssembler.fromDto(dto);
     Mockito.when(authRepo.findById(Mockito.anyString())).thenReturn(Mono.just(entity));
     Mockito.when(authRepo.save(Mockito.any())).thenReturn(Mono.just(entity));
-    authService.edit(dto, dto);
+    authService.edit(sessionAssembler.fromEntity(dto), dto);
   }
 
   @Test
@@ -81,7 +84,7 @@ public class AuthServiceTest {
     Auth entity = authAssembler.fromDto(dto);
     Mockito.when(authRepo.findById(Mockito.anyString())).thenReturn(Mono.just(entity));
     Mockito.when(authRepo.save(Mockito.any())).thenReturn(Mono.just(entity));
-    authService.delete(dto, dto);
+    authService.delete(sessionAssembler.fromEntity(dto), dto);
   }
 
   @Test
@@ -90,7 +93,7 @@ public class AuthServiceTest {
     Pageable pageable = PageRequest.of(0, 1);
     Mockito.when(authRepo.find(Mockito.any(), Mockito.any(), Mockito.any()))
         .thenReturn(Flux.just(entity));
-    authService.find(dto, dto, pageable);
+    authService.find(sessionAssembler.fromEntity(dto), dto, pageable);
   }
 
   @Test

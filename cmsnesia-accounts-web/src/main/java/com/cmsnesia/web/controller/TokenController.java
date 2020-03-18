@@ -1,6 +1,6 @@
 package com.cmsnesia.web.controller;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Collections;
 import io.swagger.annotations.Api;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,12 +20,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerRequest;
-import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.CoreSubscriber;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "token")
@@ -69,7 +65,9 @@ public class TokenController {
   @PostMapping("/validate")
   public Mono<ResponseEntity<?>> validate(ServerHttpRequest serverRequest) {
     String path = serverRequest.getPath().toString();
-    if (path.startsWith("/token/") && path.startsWith("/public/") && !path.equals("/token/validate")) {
+    if (path.startsWith("/token/")
+        && path.startsWith("/public/")
+        && !path.equals("/token/validate")) {
       return Mono.just(ResponseEntity.ok().build());
     }
     List<String> tokens = serverRequest.getHeaders().get(HttpHeaders.AUTHORIZATION);
@@ -79,7 +77,7 @@ public class TokenController {
       tokenResponse.setAccessToken(token);
       return tokenService
           .validate(tokenResponse)
-          .defaultIfEmpty(new AuthDto())
+          .defaultIfEmpty(new Session())
           .map(
               authDto -> {
                 if (StringUtils.hasText(authDto.getId())

@@ -1,6 +1,6 @@
 package com.cmsnesia.web.config.security;
 
-import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.TokenService;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
     String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String authToken = authHeader.substring(7);
-      Mono<AuthDto> authDtoMono = tokenService.validate(new TokenResponse(authToken, "", "Bearer"));
+      Mono<Session> authDtoMono = tokenService.validate(new TokenResponse(authToken, "", "Bearer"));
       return authDtoMono.map(
           authDto -> {
             Set<GrantedAuthority> authorities =

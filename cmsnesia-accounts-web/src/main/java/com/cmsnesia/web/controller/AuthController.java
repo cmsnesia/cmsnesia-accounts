@@ -1,6 +1,7 @@
 package com.cmsnesia.web.controller;
 
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.ChangePasswordRequest;
@@ -45,7 +46,7 @@ public class AuthController {
   public Mono<Result<AuthDto>> findById(@RequestParam("id") String id) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return authService.find(session, IdRequest.builder().id(id).build());
@@ -72,7 +73,7 @@ public class AuthController {
       @PageableDefault(direction = Sort.Direction.DESC) QueryPageRequest pageable) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               return authService.find(
@@ -88,7 +89,7 @@ public class AuthController {
   public Mono<Result<AuthDto>> add(@RequestBody AuthDto authDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               AuthDto dto = securing(authDto);
@@ -104,7 +105,7 @@ public class AuthController {
   public Mono<Result<AuthDto>> edit(@RequestBody AuthDto authDto) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               AuthDto dto = securing(authDto);
@@ -120,7 +121,7 @@ public class AuthController {
   public Mono<Result<AuthDto>> delete(@RequestBody IdRequest idRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               AuthDto dto = new AuthDto();
@@ -138,7 +139,7 @@ public class AuthController {
       @RequestBody ChangePasswordRequest changePasswordRequest) {
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .map(authentication -> (AuthDto) authentication.getPrincipal())
+        .map(authentication -> (Session) authentication.getPrincipal())
         .flatMap(
             session -> {
               if (changePasswordRequest

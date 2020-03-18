@@ -1,13 +1,14 @@
 package com.cmsnesia.service.impl;
 
 import com.cmsnesia.assembler.AuthAssembler;
+import com.cmsnesia.assembler.SessionAssembler;
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.domain.model.Token;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.request.RefreshTokenRequest;
 import com.cmsnesia.model.request.TokenRequest;
 import com.cmsnesia.model.response.TokenResponse;
-import com.cmsnesia.service.AuthService;
 import com.cmsnesia.service.TokenService;
 import com.cmsnesia.service.repository.AuthRepo;
 import com.cmsnesia.service.util.Crypto;
@@ -36,14 +37,14 @@ public class TokenServiceImpl implements TokenService {
   private static final String ESID = "esid";
 
   private final AuthAssembler authAssembler;
+  private final SessionAssembler sessionAssembler;
   private final AuthRepo authRepo;
-  private final AuthService authService;
   private final TokenInfo tokenInfo;
   private final Json json;
   private final Crypto crypto;
 
   @Override
-  public Mono<AuthDto> validate(TokenResponse tokenResponse) {
+  public Mono<Session> validate(TokenResponse tokenResponse) {
     String token = tokenResponse.getAccessToken();
     if (token == null) {
       return Mono.empty();
@@ -59,8 +60,8 @@ public class TokenServiceImpl implements TokenService {
                 try {
                   String base64Json = claims.get(SESSION_ATTRIBUTE, String.class);
                   String jsonString = new String(Base64.getDecoder().decode(base64Json));
-                  AuthDto authDto = json.readValue(jsonString, new TypeReference<AuthDto>() {});
-                  return Mono.just(authDto);
+                  Session session = json.readValue(jsonString, new TypeReference<Session>() {});
+                  return Mono.just(session);
                 } catch (Exception e) {
                   return Mono.empty();
                 }
@@ -121,7 +122,7 @@ public class TokenServiceImpl implements TokenService {
                 }
                 if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
                   return authRepo
-                      .findByRefreshTokenAndTokenType(AuthDto.builder().build(), token, TOKEN_TYPE)
+                      .findByRefreshTokenAndTokenType(Session.builder().build(), token, TOKEN_TYPE)
                       .flatMap(
                           auth -> {
                             auth.getTokens()
@@ -150,7 +151,7 @@ public class TokenServiceImpl implements TokenService {
   public Mono<String> destroy(TokenResponse tokenResponse) {
     if (tokenInfo.getMax() != null && tokenInfo.getMax() > 0) {
       return authRepo
-          .findByAccessTokenAndRefreshTokenAndTokenType(AuthDto.builder().build(), tokenResponse)
+          .findByAccessTokenAndRefreshTokenAndTokenType(Session.builder().build(), tokenResponse)
           .flatMap(
               auth -> {
                 auth.getTokens()
@@ -174,8 +175,9 @@ public class TokenServiceImpl implements TokenService {
 
   private Mono<TokenResponse> doEncode(AuthDto authDto) {
     try {
+      Session session = sessionAssembler.fromEntity(authDto);
       String base64Json =
-          Base64.getEncoder().encodeToString(json.writeValueAsString(authDto).getBytes("UTF-8"));
+          Base64.getEncoder().encodeToString(json.writeValueAsString(session).getBytes("UTF-8"));
       String sessionId =
           Base64.getEncoder().encodeToString(UUID.randomUUID().toString().getBytes("UTF-8"));
       String esid = Base64.getEncoder().encodeToString(crypto.encrypt(sessionId));
@@ -200,7 +202,7 @@ public class TokenServiceImpl implements TokenService {
               .setExpiration(
                   new Date(creationTime.getTime() + tokenInfo.getRefreshTokenExparation()))
               .signWith(SignatureAlgorithm.HS512, tokenInfo.getSecret())
-              .claim(USERNAME, authDto.getUsername())
+              .claim(USERNAME, session.getUsername())
               .claim(SESSION_ID, sessionId)
               .claim(ESID, esid)
               .compact();
@@ -281,7 +283,7 @@ public class TokenServiceImpl implements TokenService {
 
   private Mono<Claims> validateAccessTokenState(String accessToken) {
     return authRepo
-        .findByAccessTokenAndType(AuthDto.builder().build(), accessToken, TOKEN_TYPE)
+        .findByAccessTokenAndType(Session.builder().build(), accessToken, TOKEN_TYPE)
         .flatMap(
             auth -> {
               Set<Token> tokens =
@@ -301,7 +303,7 @@ public class TokenServiceImpl implements TokenService {
 
   private Mono<Claims> validateRefreshTokenState(String accessToken) {
     return authRepo
-        .findByRefreshTokenAndTokenType(AuthDto.builder().build(), accessToken, TOKEN_TYPE)
+        .findByRefreshTokenAndTokenType(Session.builder().build(), accessToken, TOKEN_TYPE)
         .flatMap(
             auth -> {
               Set<Token> tokens =

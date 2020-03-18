@@ -2,6 +2,7 @@ package com.cmsnesia.service.repository.custom;
 
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.request.IdRequest;
 import com.cmsnesia.model.response.TokenResponse;
 import com.cmsnesia.service.util.Sessions;
@@ -23,13 +24,13 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
   private final ReactiveMongoTemplate reactiveMongoTemplate;
 
   @Override
-  public Mono<Auth> find(AuthDto session, IdRequest id) {
+  public Mono<Auth> find(Session session, IdRequest id) {
     Query query = buildQuery(session, AuthDto.builder().id(id.getId()).build(), null, null, null);
     return reactiveMongoTemplate.findOne(query, Auth.class);
   }
 
   @Override
-  public Flux<Auth> find(AuthDto session, AuthDto dto, Pageable pageable) {
+  public Flux<Auth> find(Session session, AuthDto dto, Pageable pageable) {
     Query query = buildQuery(session, dto, null, null, null);
     if (pageable.isPaged()) {
       query.with(pageable);
@@ -38,28 +39,28 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
   }
 
   @Override
-  public Mono<Long> countFind(AuthDto session, AuthDto dto) {
+  public Mono<Long> countFind(Session session, AuthDto dto) {
     Query query = buildQuery(session, dto, null, null, null);
     return reactiveMongoTemplate.count(query, Auth.class);
   }
 
   @Override
   public Mono<Auth> findByAccessTokenAndType(
-      AuthDto session, String accessToken, String tokenType) {
+      Session session, String accessToken, String tokenType) {
     Query query = buildQuery(session, AuthDto.builder().build(), accessToken, null, tokenType);
     return reactiveMongoTemplate.findOne(query, Auth.class);
   }
 
   @Override
   public Mono<Auth> findByRefreshTokenAndTokenType(
-      AuthDto session, String refreshToken, String tokenType) {
+      Session session, String refreshToken, String tokenType) {
     Query query = buildQuery(session, AuthDto.builder().build(), null, refreshToken, tokenType);
     return reactiveMongoTemplate.findOne(query, Auth.class);
   }
 
   @Override
   public Mono<Auth> findByAccessTokenAndRefreshTokenAndTokenType(
-      AuthDto session, TokenResponse token) {
+      Session session, TokenResponse token) {
     Query query =
         buildQuery(
             session,
@@ -71,7 +72,7 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
   }
 
   @Override
-  public Mono<Auth> changePassword(AuthDto session, String newPassword) {
+  public Mono<Auth> changePassword(Session session, String newPassword) {
     Query query = new Query();
     query.addCriteria(Criteria.where("id").is(session.getId()));
     Update update = new Update();
@@ -80,7 +81,7 @@ public class AuthRepoCustomImpl implements AuthRepoCustom {
   }
 
   private Query buildQuery(
-      AuthDto session, AuthDto dto, String accessToken, String refreshToken, String tokenType) {
+      Session session, AuthDto dto, String accessToken, String refreshToken, String tokenType) {
     Query query = new Query();
 
     query.with(Sort.by(Sort.Order.desc("createdAt")));

@@ -4,13 +4,11 @@ import com.cmsnesia.domain.model.Email;
 import com.cmsnesia.domain.model.Token;
 import com.cmsnesia.domain.validator.EmailCollection;
 import com.cmsnesia.domain.validator.Password;
-
 import java.util.Set;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;

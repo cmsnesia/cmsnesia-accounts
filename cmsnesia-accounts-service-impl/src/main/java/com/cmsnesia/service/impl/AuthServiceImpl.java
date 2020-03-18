@@ -3,6 +3,7 @@ package com.cmsnesia.service.impl;
 import com.cmsnesia.assembler.AuthAssembler;
 import com.cmsnesia.domain.Auth;
 import com.cmsnesia.model.AuthDto;
+import com.cmsnesia.model.Session;
 import com.cmsnesia.model.api.Result;
 import com.cmsnesia.model.api.StatusCode;
 import com.cmsnesia.model.request.IdRequest;
@@ -28,7 +29,7 @@ public class AuthServiceImpl implements AuthService {
   private final AuthRepo authRepo;
 
   @Override
-  public Mono<Result<AuthDto>> add(AuthDto authDto, AuthDto dto) {
+  public Mono<Result<AuthDto>> add(Session authDto, AuthDto dto) {
     Auth auth = authAssembler.fromDto(dto);
     auth.setId(UUID.randomUUID().toString());
     auth.setCreatedBy(authDto.getId());
@@ -41,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<Result<AuthDto>> edit(AuthDto authDto, AuthDto dto) {
+  public Mono<Result<AuthDto>> edit(Session authDto, AuthDto dto) {
     return authRepo
         .findById(dto.getId())
         .flatMap(
@@ -59,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<Result<AuthDto>> delete(AuthDto authDto, AuthDto dto) {
+  public Mono<Result<AuthDto>> delete(Session authDto, AuthDto dto) {
     return authRepo
         .findById(dto.getId())
         .flatMap(
@@ -75,14 +76,14 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<Page<AuthDto>> find(AuthDto authDto, AuthDto dto, Pageable pageable) {
+  public Mono<Page<AuthDto>> find(Session session, AuthDto dto, Pageable pageable) {
     return authRepo
-        .countFind(authDto, dto)
+        .countFind(session, dto)
         .flatMap(
             count -> {
               Mono<List<AuthDto>> mono =
                   authRepo
-                      .find(authDto, dto, pageable)
+                      .find(session, dto, pageable)
                       .map(auth -> authAssembler.fromEntity(auth))
                       .collectList();
               return mono.map(authDtos -> new PageImpl<>(authDtos, pageable, count));
@@ -90,7 +91,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<Result<AuthDto>> find(AuthDto session, IdRequest idRequest) {
+  public Mono<Result<AuthDto>> find(Session session, IdRequest idRequest) {
     return authRepo
         .find(session, idRequest)
         .map(authAssembler::fromEntity)
@@ -110,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public Mono<Result<AuthDto>> changePassword(AuthDto session, String newPassword) {
+  public Mono<Result<AuthDto>> changePassword(Session session, String newPassword) {
     return authRepo
         .changePassword(session, newPassword)
         .map(auth -> Result.build(authAssembler.fromEntity(auth), StatusCode.SAVE_SUCCESS));
