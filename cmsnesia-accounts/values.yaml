@@ -54,4 +54,4 @@ resources:
 cmsnesia:
   spring:
     application:
-      json: '{"spring.data.mongodb.uri":"mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false","cmsnesia.token.issuer":"ardikars","cmsnesia.token.accessTokenExparation":"207360000","cmsnesia.token.refreshTokenExparation":"414720000","cmsnesia.token.secret":"47uDxE74","cmsnesia.token.max":"0"}'
+      json: '{"sparing.applicatin.name":"cmsnesia-accounts","spring.data.mongodb.uri":"mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false","cmsnesia.token.issuer":"ardikars","cmsnesia.token.accessTokenExparation":"207360000","cmsnesia.token.refreshTokenExparation":"414720000","cmsnesia.token.secret":"47uDxE74","cmsnesia.token.max":"0"}'
