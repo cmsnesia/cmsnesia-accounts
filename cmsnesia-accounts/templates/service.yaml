@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "cmsnesia-accounts.fullname" . }}
+  labels:
+    {{- include "cmsnesia-accounts.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+  selector:
+    {{- include "cmsnesia-accounts.selectorLabels" . | nindent 4 }}

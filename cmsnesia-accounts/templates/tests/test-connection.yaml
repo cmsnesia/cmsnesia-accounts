@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "cmsnesia-accounts.fullname" . }}-test-connection"
+  labels:
+    {{- include "cmsnesia-accounts.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test-success
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "cmsnesia-accounts.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

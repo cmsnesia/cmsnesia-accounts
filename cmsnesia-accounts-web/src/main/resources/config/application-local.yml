@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active:
+      - local
+    include:
+      - common
+  data:
+    mongodb:
+      uri: 'mongodb://ardikars:abc123@ds117806.mlab.com:17806/heroku_1nj4kkqc?retryWrites=false'
+  codec:
+    max-in-memory-size: 5MB
+
+cmsnesia:
+  token:
+    issuer: 'cmsnesia'
+    accessTokenExparation: 3000000
+    refreshTokenExparation: 6000000
+    secret: 'bo7tcynit34'
+    max: 0

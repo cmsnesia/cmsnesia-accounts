@@ -1,0 +1,19 @@
+spring:
+  profiles:
+    active:
+      - local
+    include:
+      - common
+  data:
+    mongodb:
+      uri: ''
+  codec:
+    max-in-memory-size: 5MB
+
+cmsnesia:
+  token:
+    issuer: 'cmsnesia'
+    accessTokenExparation: 300000
+    refreshTokenExparation: 600000
+    secret: ''
+    max: 0

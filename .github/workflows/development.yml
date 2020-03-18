@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+
+  build:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout master
+        uses: actions/checkout@master
+
+      - name: Deploy artifact to github package registry
+        run: |
+          echo "${{ secrets.mvn_settings_base64 }}" | base64 --decode > .mvn/release-settings.xml
+          ./mvnw -B -s .mvn/release-settings.xml -pl !cmsnesia-accounts-web,!cmsnesia-accounts-tests,!cmsnesia-accounts-service-spec,!cmsnesia-accounts-service-impl,!cmsnesia-accounts-domain,!cmsnesia-accounts-assembler clean package deploy -DskipTests
+
+      - name: Build container image
+        run: docker build -t ardikars/cmsnesia-accounts:snapshot .
+
+      - name: Docker Login
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+      - name: Push image to Docker Hub
+        run: docker push ardikars/cmsnesia-accounts
+
+      - name: Deploy application to development environment
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.kube_config }}" | base64 --decode > ~/.kube/config
+          echo "${{ secrets.helm_development }}" | base64 --decode > cmsnesia-accounts/values.yaml
+          curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+          sed -i.bak 's/^\(\s*appVersion\s*:\s*\).*/\1 snapshot/' cmsnesia-accounts/Chart.yaml
+          helm upgrade --install cmsnesia-accounts cmsnesia-accounts -n development
+          helm upgrade --install cmsnesia-accounts cmsnesia-accounts -n development
