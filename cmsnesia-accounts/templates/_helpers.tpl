@@ -50,3 +50,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "cmsnesia-accounts.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "cmsnesia-accounts.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "cmsnesia-accounts.fullname" .) .Values.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
