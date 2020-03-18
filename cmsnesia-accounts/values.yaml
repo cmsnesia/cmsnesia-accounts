@@ -21,6 +21,10 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
+rbac:
+  create: true
+  readSecrets: false
+
 service:
   type: ClusterIP
   port: 80
