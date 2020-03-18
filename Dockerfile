@@ -19,4 +19,4 @@ WORKDIR /app
 
 COPY --from=builder /workspace/cmsnesia-accounts-web/target/cmsnesia-accounts-web-*.jar /app/cmsnesia-accounts-web.jar
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "-Dserver.port=80", "/app/cmsnesia-accounts-web.jar"]
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app/cmsnesia-accounts-web.jar"]
