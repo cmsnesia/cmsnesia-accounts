@@ -35,10 +35,10 @@ ingress:
       more_set_headers "Referrer-Policy: no-referrer";
   tls:
     - hosts:
-        - "api.cmsnesia.com"
+        - "api.ardikars.com"
       secretName: cmsnesia-tls
   hosts:
-    - host: "api.cmsnesia.com"
+    - host: "api.ardikars.com"
       paths:
         - "/auth/v2(/|$)(.*)"
 

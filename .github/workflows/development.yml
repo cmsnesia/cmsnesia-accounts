@@ -34,8 +34,5 @@ jobs:
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.kube_config }}" | base64 --decode > ~/.kube/config
-          echo "${{ secrets.helm_development }}" | base64 --decode > cmsnesia-accounts/values.yaml
           curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
-          sed -i.bak 's/^\(\s*appVersion\s*:\s*\).*/\1 snapshot/' cmsnesia-accounts/Chart.yaml
-          helm upgrade --install cmsnesia-accounts cmsnesia-accounts -n development
           helm upgrade --install cmsnesia-accounts cmsnesia-accounts -n development
