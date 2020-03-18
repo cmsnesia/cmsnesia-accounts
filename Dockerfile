@@ -1,11 +1,10 @@
-FROM maven:3.6.1-jdk-8-alpine AS builder
+FROM adoptopenjdk/openjdk11 AS builder
 
 WORKDIR /workspace
 COPY . .
-RUN mvn -e -B clean package -DskipTests
+RUN ./mvnw -e -B clean package -DskipTests
 
-#FROM openjdk:14-jdk-alpine
-FROM openjdk:8-jre-alpine
+FROM adoptopenjdk/openjdk11:alpine-jre
 
 LABEL APP="cmsnesia-accounts-web"
 LABEL DOMAIN="cmsnesia-accounts"
