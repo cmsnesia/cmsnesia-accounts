@@ -82,7 +82,7 @@ public class TokenController {
     String token = serverRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     if (StringUtils.hasText(token) && token.length() > 7) {
       TokenResponse tokenResponse = new TokenResponse();
-      tokenResponse.setAccessToken(token);
+      tokenResponse.setAccessToken(token.substring(7));
       return tokenService
           .validate(tokenResponse)
           .defaultIfEmpty(new Session())
