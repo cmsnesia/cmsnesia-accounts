@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Base64;
+
 @RestController
 @RequestMapping(value = "token")
 @Api(
@@ -90,7 +92,9 @@ public class TokenController {
                     && !Collections.isEmpty(authDto.getApplications())) {
                   try {
                     String json = objectMapper.writeValueAsString(authDto);
-                    return ResponseEntity.ok().header("X-User-Data", json).build();
+                    return ResponseEntity.ok()
+                        .header("X-User-Data", Base64.getEncoder().encodeToString(json.getBytes()))
+                        .build();
                   } catch (JsonProcessingException e) {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
                   }
