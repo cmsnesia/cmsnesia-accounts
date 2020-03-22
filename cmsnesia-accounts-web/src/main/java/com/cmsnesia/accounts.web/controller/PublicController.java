@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +53,12 @@ public class PublicController {
                 }));
   }
 
-  @GetMapping("/description")
-  public Mono<String> description() {
-    return Mono.just(discoveryClient.description());
+  @GetMapping("/whoami")
+  public Mono<String> whoami() {
+    try {
+      return Mono.just(InetAddress.getLocalHost().getHostName());
+    } catch (UnknownHostException e) {
+      return Mono.just("Unknown");
+    }
   }
 }
