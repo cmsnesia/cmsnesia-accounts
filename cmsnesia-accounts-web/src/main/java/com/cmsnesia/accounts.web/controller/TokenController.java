@@ -75,6 +75,7 @@ public class TokenController {
   })
   public Mono<ResponseEntity<?>> validate(@ApiIgnore ServerHttpRequest serverRequest) {
     String path = serverRequest.getPath().toString();
+    log.info("Path: ", path);
     if (StringUtils.hasText(path)) {
       if (Arrays.asList(path.split("/")).stream().anyMatch(s -> s.equalsIgnoreCase("public"))) {
         return Mono.just(ResponseEntity.ok().build());

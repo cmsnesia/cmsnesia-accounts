@@ -49,8 +49,8 @@ public class WebSecurityConfig {
                     () -> {
                       try {
                         ServerHttpRequest request = swe.getRequest();
-                        logger.info("ID      : {}", request.getPath());
-                        logger.info("Path    : {}", request.getId());
+                        logger.info("ID      : {}", request.getId());
+                        logger.info("Path    : {}", request.getPath());
                         logger.info("URI     : {}", request.getURI().toString());
                         logger.info("URL     : {}", request.getURI().toURL().toString());
                         logger.info("Method  : {}", request.getMethod());
