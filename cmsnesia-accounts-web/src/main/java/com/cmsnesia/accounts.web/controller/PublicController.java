@@ -29,7 +29,7 @@ public class PublicController {
   private final DiscoveryClient discoveryClient;
 
   @GetMapping("/services")
-  public Flux<List<Map<String, Object>>> services() {
+  public Flux<Map<String, Object>> services() {
     return Flux.fromStream(
         discoveryClient.getServices().stream()
             .map(
@@ -47,18 +47,14 @@ public class PublicController {
                                 return instance;
                               })
                           .collect(Collectors.toList());
+                  try {
+                    service.put("hostName", InetAddress.getLocalHost().getHostName());
+                  } catch (UnknownHostException e) {
+                    service.put("hostName", "Unknown");
+                  }
                   service.put("serviceId", serviceId);
                   service.put("instances", instances);
-                  return instances;
+                  return service;
                 }));
-  }
-
-  @GetMapping("/whoami")
-  public Mono<String> whoami() {
-    try {
-      return Mono.just(InetAddress.getLocalHost().getHostName());
-    } catch (UnknownHostException e) {
-      return Mono.just("Unknown");
-    }
   }
 }
