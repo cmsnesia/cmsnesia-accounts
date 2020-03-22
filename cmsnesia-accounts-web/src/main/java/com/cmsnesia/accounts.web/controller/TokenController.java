@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.Arrays;
 import java.util.Base64;
 
 @RestController
@@ -74,10 +75,15 @@ public class TokenController {
   })
   public Mono<ResponseEntity<?>> validate(@ApiIgnore ServerHttpRequest serverRequest) {
     String path = serverRequest.getPath().toString();
-    if (path.startsWith("/token/")
-        && path.startsWith("/public/")
-        && !path.equals("/token/validate")) {
-      return Mono.just(ResponseEntity.ok().build());
+    if (StringUtils.hasText(path)) {
+      if (Arrays.asList(path.split("/")).stream().anyMatch(s -> s.equalsIgnoreCase("public"))) {
+        return Mono.just(ResponseEntity.ok().build());
+      }
+      if (path.startsWith("/token/")
+          && path.startsWith("/public/")
+          && !path.equals("/token/validate")) {
+        return Mono.just(ResponseEntity.ok().build());
+      }
     }
     String token = serverRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     if (StringUtils.hasText(token) && token.length() > 7) {
