@@ -8,13 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +23,8 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class PublicController {
+
+  private static final String APP_INSTANCE_ID = UUID.randomUUID().toString();
 
   private final DiscoveryClient discoveryClient;
 
@@ -47,11 +47,7 @@ public class PublicController {
                                 return instance;
                               })
                           .collect(Collectors.toList());
-                  try {
-                    service.put("hostName", InetAddress.getLocalHost().getHostName());
-                  } catch (UnknownHostException e) {
-                    service.put("hostName", "Unknown");
-                  }
+                  service.put("appInstanceId", APP_INSTANCE_ID);
                   service.put("serviceId", serviceId);
                   service.put("instances", instances);
                   return service;

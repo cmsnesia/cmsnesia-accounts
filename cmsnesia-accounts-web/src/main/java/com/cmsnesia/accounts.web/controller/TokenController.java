@@ -75,17 +75,20 @@ public class TokenController {
   })
   public Mono<ResponseEntity<?>> validate(@ApiIgnore ServerHttpRequest serverRequest) {
     String path = serverRequest.getPath().toString();
-    log.info("Path: ", path);
-    if (StringUtils.hasText(path)) {
-      if (Arrays.asList(path.split("/")).stream().anyMatch(s -> s.equalsIgnoreCase("public"))) {
-        return Mono.just(ResponseEntity.ok().build());
-      }
-      if (path.startsWith("/token/")
-          && path.startsWith("/public/")
-          && !path.equals("/token/validate")) {
+    String forwaredPath = serverRequest.getHeaders().getFirst("X-Original-URI");
+
+    if (StringUtils.hasText(forwaredPath)) {
+      if (Arrays.asList(forwaredPath.split("/")).stream().anyMatch(s -> s.equalsIgnoreCase("public"))) {
         return Mono.just(ResponseEntity.ok().build());
       }
     }
+
+    if (path.startsWith("/token/")
+            && path.startsWith("/public/")
+            && !path.equals("/token/validate")) {
+      return Mono.just(ResponseEntity.ok().build());
+    }
+
     String token = serverRequest.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
     if (StringUtils.hasText(token) && token.length() > 7) {
       TokenResponse tokenResponse = new TokenResponse();
